@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: ilm-knowledge-platform
+    runtime: node
+    buildCommand: npm install && npm run build -w apps/web
+    startCommand: npm run start -w apps/web
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+        description: "Your Gemini API Key (starts with AIzaSy...)"
+      - key: NEXT_PUBLIC_GEMINI_API_KEY
+        sync: false
+        description: "Your Gemini API Key (Public fallback)"
+      - key: NODE_VERSION
+        value: 20
