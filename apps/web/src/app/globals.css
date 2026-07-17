@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fbfaf7; /* High-end Creamy White */
+  --foreground: #0c0b0a;
+  --card: #ffffff;
+  --card-foreground: #0c0b0a;
+  --border: #e8e5de; /* Soft warm grey border */
+  --primary: #0c0b0a; /* Premium Black */
+  --primary-foreground: #fbfaf7;
+  --secondary: #efece6;
+  --secondary-foreground: #2d2925;
+  --muted: #8c867c;
+  --muted-foreground: #5e574f;
+  --ring: rgba(12, 11, 10, 0.1);
+  --radius: 8px; /* Slightly sharper, modern corners */
+}
+
+.dark {
+  --background: #0a0a09; /* Obsidian Black */
+  --foreground: #f4f0ec;
+  --card: #121211;
+  --card-foreground: #f4f0ec;
+  --border: #22201e;
+  --primary: #f4f0ec; /* Clean White */
+  --primary-foreground: #0a0a09;
+  --secondary: #1a1917;
+  --secondary-foreground: #e4dcd3;
+  --muted: #5e574f;
+  --muted-foreground: #a69e94;
+  --ring: rgba(244, 240, 236, 0.1);
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  
+  --font-sans: var(--font-sans), system-ui, sans-serif;
+  --font-serif: var(--font-serif), Georgia, serif;
+  --font-mono: var(--font-mono), monospace;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Custom Inshorts Scrolling Layout */
+.inshorts-deck {
+  height: calc(100vh - 120px);
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none; /* Firefox */
+}
+.inshorts-deck::-webkit-scrollbar {
+  display: none; /* Safari / Chrome */
+}
+.inshorts-card {
+  height: calc(100vh - 120px);
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* Micro-interactions */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
