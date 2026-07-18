@@ -29,6 +29,9 @@ export default function ThemeInitializer() {
     };
 
     const savedColor = localStorage.getItem("ilm_accent_color") || "orange";
+    if (!localStorage.getItem("ilm_accent_color")) {
+      localStorage.setItem("ilm_accent_color", "orange");
+    }
     const selected = colors[savedColor];
     if (selected) {
       document.documentElement.style.setProperty("--primary", selected.primary);
@@ -37,9 +40,11 @@ export default function ThemeInitializer() {
     }
 
     // 2. Load and apply Light/Dark Mode
-    const savedTheme = localStorage.getItem("theme");
-    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    if (savedTheme === "dark" || (!savedTheme && systemPrefersDark)) {
+    const savedTheme = localStorage.getItem("theme") || "light";
+    if (!localStorage.getItem("theme")) {
+      localStorage.setItem("theme", "light");
+    }
+    if (savedTheme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");

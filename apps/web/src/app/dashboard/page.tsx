@@ -50,8 +50,8 @@ export default function DashboardPage() {
     setDailyChallenge(getDailyChallenge());
 
     // Theme config
-    const isDark = document.documentElement.classList.contains("dark") || 
-      (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    const savedTheme = localStorage.getItem("theme") || "light";
+    const isDark = savedTheme === "dark";
     setIsDarkMode(isDark);
     if (isDark) document.documentElement.classList.add("dark");
     else document.documentElement.classList.remove("dark");
@@ -175,7 +175,6 @@ export default function DashboardPage() {
           </div>
           <div>
             <h1 className="text-sm font-semibold tracking-tight font-serif">Ilm</h1>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-mono">Daily Intelligence OS</p>
           </div>
         </div>
 
@@ -206,7 +205,8 @@ export default function DashboardPage() {
               <div className="absolute top-0 right-0 h-32 w-32 bg-primary/5 rounded-full blur-2xl -z-10" />
               
               <span className="text-[11px] font-mono uppercase tracking-widest text-primary font-bold">Workspace Overview</span>
-              <h2 className="text-2xl font-bold tracking-tight font-serif mt-1 mb-4">Hello, {username}</h2>
+              <h2 className="text-2xl font-bold tracking-tight font-serif mt-1 mb-1">Hello, {username}</h2>
+              <p className="text-[11px] italic text-muted-foreground mb-4">Be smarter in 5 min than Yesterday</p>
               
               <div className="flex flex-col gap-3 border-t border-border/20 pt-4 mb-6">
                 <div className="flex items-center justify-between text-xs">
