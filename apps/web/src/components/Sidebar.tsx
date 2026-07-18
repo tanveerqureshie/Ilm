@@ -3,17 +3,44 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Compass, Network, User, Calendar, LogOut } from "lucide-react";
+import { Home, Compass, Network, User, Calendar, LogOut, Sun, Moon } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [username, setUsername] = useState<string>("Tanveer Qureshie");
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
   useEffect(() => {
     const savedName = localStorage.getItem("ilm_username");
     if (savedName) setUsername(savedName);
+
+    // Initial theme check
+    const savedTheme = localStorage.getItem("theme") || "light";
+    setIsDarkMode(savedTheme === "dark");
+
+    // Sync theme shifts
+    const handleThemeSync = () => {
+      const isDarkNow = document.documentElement.classList.contains("dark");
+      setIsDarkMode(isDarkNow);
+    };
+
+    window.addEventListener("theme-change", handleThemeSync);
+    return () => window.removeEventListener("theme-change", handleThemeSync);
   }, []);
+
+  const toggleTheme = () => {
+    const newDark = !isDarkMode;
+    setIsDarkMode(newDark);
+    if (newDark) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+    window.dispatchEvent(new Event("theme-change"));
+  };
 
   // Hide sidebar on the Welcome landing page
   if (pathname === "/") return null;
@@ -80,6 +107,13 @@ export default function Sidebar() {
             <span className="text-[10px] text-muted-foreground block uppercase font-mono tracking-wider">Session Profile</span>
             <span className="text-xs font-bold text-foreground font-serif block truncate">{username}</span>
           </div>
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-xl text-muted-foreground hover:text-primary hover:bg-secondary/40 border border-transparent transition-all"
+            title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          >
+            {isDarkMode ? <Sun className="h-4 w-4 text-primary" /> : <Moon className="h-4 w-4" />}
+          </button>
           <Link
             href="/"
             className="p-2 rounded-xl text-muted-foreground hover:text-rose-500 hover:bg-rose-500/5 border border-transparent hover:border-rose-500/10 transition-all"

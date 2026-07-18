@@ -168,7 +168,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen pb-32">
       {/* Header Panel */}
-      <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-md border-b border-border/40 py-4 px-6 flex items-center justify-between">
+      <header className="lg:hidden sticky top-0 z-40 bg-background/85 backdrop-blur-md border-b border-border/40 py-4 px-6 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center text-white font-bold text-lg shadow-md shadow-primary/20">
             إ
@@ -198,7 +198,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* LEFT SIDEBAR (Progress Overview) */}
-          <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-6">
+          <div className="lg:col-span-4 lg:sticky lg:top-10 space-y-6">
             
             {/* Session Info card - Strong Neumorphic Glass Outset */}
             <section className="soft-glass-outset rounded-3xl p-6 border-border/30 relative overflow-hidden">
@@ -212,10 +212,6 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground flex items-center gap-1.5"><Calendar className="h-4 w-4" /> Today's Date:</span>
                   <strong className="text-foreground text-[11px] font-sans">{formattedDate}</strong>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground flex items-center gap-1.5"><BookOpen className="h-4 w-4" /> Study Focus:</span>
-                  <strong className="text-foreground">UPSC, Medical, Finance & Tech</strong>
                 </div>
               </div>
 
