@@ -22,64 +22,64 @@ export default function KnowledgeGraphPage() {
 
   const nodes: Node[] = [
     {
-      id: "ai",
-      label: "Artificial Intelligence",
-      category: "Core Concept",
-      description: "The overarching domain of intelligence demonstrated by machines, including reasoning, search, learning, and neural representation.",
-      connections: ["llm", "embeddings", "vector-db", "attention"],
+      id: "neuroplasticity",
+      label: "Neuroplasticity & Learning",
+      category: "Physiology",
+      description: "The brain's ability to reorganize itself by forming new neural pathways throughout life. Regular mental workouts and sleep optimize this process.",
+      connections: ["active-listening", "digital-hygiene"],
       status: "learned",
-      x: 250,
+      x: 260,
       y: 200
     },
     {
-      id: "llm",
-      label: "Large Language Models (LLMs)",
-      category: "AI Architecture",
-      description: "Deep learning models trained on vast text corpora, capable of understanding and generating human-like language based on statistical likelihood.",
-      connections: ["ai", "attention", "rag"],
+      id: "stoicism",
+      label: "Stoic Resilience",
+      category: "Life Philosophy",
+      description: "An ancient mindset focusing on control: differentiating between what is up to us and what is not, creating high emotional equilibrium in stress.",
+      connections: ["active-listening", "parenting"],
       status: "learned",
       x: 100,
-      y: 80
+      y: 100
     },
     {
-      id: "embeddings",
-      label: "Vector Embeddings",
-      category: "Mathematical Insight",
-      description: "Representations of words, phrases, or documents as high-dimensional mathematical coordinates. Closer coordinates represent high semantic similarity.",
-      connections: ["ai", "vector-db"],
+      id: "active-listening",
+      label: "Active Listening",
+      category: "Social Habits",
+      description: "The conscious process of fully hearing, understanding, and responding to others. Key to deep bonding and trust in relationships.",
+      connections: ["neuroplasticity", "stoicism", "parenting"],
       status: "learned",
-      x: 400,
-      y: 80
+      x: 420,
+      y: 90
     },
     {
-      id: "vector-db",
-      label: "Vector Database",
-      category: "Database & Infra",
-      description: "A specialized index capable of storing and searching multi-dimensional vectors with sub-second retrieval times, critical for long-term AI memory.",
-      connections: ["ai", "embeddings", "rag"],
-      status: "learned",
-      x: 450,
-      y: 320
-    },
-    {
-      id: "attention",
-      label: "Attention Mechanism",
-      category: "AI Architecture",
-      description: "A mathematical layer in transformers enabling the model to dynamically focus on different words in a sequence based on contextual relevance.",
-      connections: ["ai", "llm"],
+      id: "parenting",
+      label: "Secure Attachment Bonding",
+      category: "Parenting & Relations",
+      description: "A psychological model of bonding where children feel safe to explore because their parents are consistently responsive to their emotional needs.",
+      connections: ["stoicism", "active-listening", "social-cohesion"],
       status: "learned",
       x: 80,
-      y: 300
+      y: 310
     },
     {
-      id: "rag",
-      label: "Retrieval-Augmented Gen (RAG)",
-      category: "Applications",
-      description: "An architectural pattern that retrieves factual matches from external databases using embeddings, appending them to the prompt to eliminate AI hallucinations.",
-      connections: ["llm", "vector-db"],
+      id: "digital-hygiene",
+      label: "Digital Hygiene",
+      category: "Mobile Habits",
+      description: "Practices like gray-scaling screen modes, setting screen-free zones, and scheduling digital fasts to protect attention span and dopamine receptors.",
+      connections: ["neuroplasticity", "social-cohesion"],
+      status: "learned",
+      x: 430,
+      y: 310
+    },
+    {
+      id: "social-cohesion",
+      label: "Social Cohesion",
+      category: "Social Habits",
+      description: "The strength of relationships and the sense of solidarity among community members, which acts as a major indicator of longevity and health.",
+      connections: ["parenting", "digital-hygiene"],
       status: "unlocked",
-      x: 250,
-      y: 350
+      x: 260,
+      y: 340
     }
   ];
 
@@ -148,18 +148,18 @@ export default function KnowledgeGraphPage() {
             className="w-full pl-10 pr-4 py-2.5 bg-card/60 backdrop-blur-md rounded-xl border border-border/20 text-xs focus:outline-none focus:border-primary/50 text-foreground"
           />
         </div>
-        <div className="flex gap-2">
-          {["all", "Core Concept", "AI Architecture", "Database & Infra"].map(cat => (
+        <div className="flex flex-wrap gap-2">
+          {["all", "Physiology", "Life Philosophy", "Social Habits", "Parenting & Relations", "Mobile Habits"].map(cat => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-3.5 py-2.5 rounded-xl border text-[11px] font-medium transition-all ${
+              className={`px-3.5 py-2 py-2.5 rounded-xl border text-[11px] font-medium transition-all ${
                 activeCategory === cat 
                   ? "bg-primary text-white border-primary" 
                   : "bg-card/45 border-border/20 text-muted-foreground hover:bg-secondary/40"
               }`}
             >
-              {cat === "all" ? "All Nodes" : cat}
+              {cat === "all" ? "All" : cat}
             </button>
           ))}
         </div>

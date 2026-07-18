@@ -2,10 +2,10 @@
 // Ensures content changes dynamically every calendar day
 
 export interface DailyNews {
-  worldNews: { title: string; summary: string; source: string; tag: string };
-  indiaTechNews: { title: string; summary: string; source: string; tag: string };
-  jkNews: { title: string; summary: string; source: string; tag: string };
-  youtuberNews: { title: string; summary: string; source: string; tag: string };
+  worldNews: { title: string; summary: string; source: string; tag: string }[];
+  indiaTechNews: { title: string; summary: string; source: string; tag: string }[];
+  jkNews: { title: string; summary: string; source: string; tag: string }[];
+  youtuberNews: { title: string; summary: string; source: string; tag: string }[];
 }
 
 export interface DailyConcepts {
@@ -60,6 +60,24 @@ const WORLD_NEWS_POOL = [
     summary: "Infrastructure investments in Brazil and Argentina have restructured supply routes, lowering transport costs across the Pacific basin.",
     source: "Reuters",
     tag: "World News"
+  },
+  {
+    title: "NASA Webb Telescope Uncovers Atmosphere on TRAPPIST-1 Exoplanet",
+    summary: "Astronomers detected trace carbon signatures on the Earth-sized exoplanet, a key milestone in the search for habitable biosignatures outside our solar system.",
+    source: "Nature Astronomy",
+    tag: "World News"
+  },
+  {
+    title: "Global Climate Accord Enforces Maritime Shipping Emissions Cap",
+    summary: "A coalition of 120 countries passed binding limits on carbon outputs for international container fleets, accelerating transition to hydrogen fuel.",
+    source: "Bloomberg Green",
+    tag: "World News"
+  },
+  {
+    title: "Renewable Energy Crosses 40% Threshold Across European Union",
+    summary: "Wind and solar infrastructure outpaced coal and gas generation combined for the first time during the second quarter of the fiscal year.",
+    source: "Euronews",
+    tag: "World News"
   }
 ];
 
@@ -80,6 +98,24 @@ const INDIA_TECH_NEWS_POOL = [
     title: "Defense Startup Unveils Autonomous High-Altitude Drone Grid",
     summary: "A Bengaluru startup completed successful test flights of solar-powered surveillance drones capable of remaining airborne for consecutive weeks.",
     source: "Hindustan Times",
+    tag: "India Technology"
+  },
+  {
+    title: "ISRO Launches Next-Gen Navigation Satellite Fleet",
+    summary: "The Indian Space Research Organisation deployed advanced NavIC satellites to improve civilian location accuracy down to one meter.",
+    source: "NDTV Tech",
+    tag: "India Technology"
+  },
+  {
+    title: "Unified Payments Interface (UPI) Launches Across South East Asia",
+    summary: "India's instant payment framework is now accepted in Singapore and Thailand, enabling seamless cross-border retail merchant transfers.",
+    source: "Business Standard",
+    tag: "India Technology"
+  },
+  {
+    title: "AI Startup Launches Localized Indic LLM for Healthcare Diagnostics",
+    summary: "A new medical foundation model trained on regional Indian dialects helps rural practitioners translate diagnostics records instantly.",
+    source: "TechCrunch",
     tag: "India Technology"
   }
 ];
@@ -102,6 +138,24 @@ const JK_NEWS_POOL = [
     summary: "A state-of-the-art storage facility in Pampore is helping growers preserve aromatic qualities, fetching premium export values globally.",
     source: "Kashmir Life",
     tag: "J&K Update"
+  },
+  {
+    title: "J&K Tourism Registers Record-Breaking Winter Footfall in Gulmarg",
+    summary: "Over one million visitors arrived during the winter season, boosting regional hospitality sectors and creating local micro-entrepreneurship roles.",
+    source: "Greater Kashmir",
+    tag: "J&K Update"
+  },
+  {
+    title: "Srinagar Smart City Deploys Fully Electric Public Bus Fleet",
+    summary: "Eighty zero-emission buses commenced passenger routes across the district, targeting reduced particulate pollution near Dal Lake.",
+    source: "Rising Kashmir",
+    tag: "J&K Update"
+  },
+  {
+    title: "Gurez Valley Connected to National Electricity Grid",
+    summary: "The high-altitude border valley received standard transmission line connectivity, ending decade-long reliance on diesel generator grids.",
+    source: "Kashmir Reader",
+    tag: "J&K Update"
   }
 ];
 
@@ -121,6 +175,24 @@ const YOUTUBER_NEWS_POOL = [
   {
     title: "CarryMinati Achieves Milestone with Charity Streaming Drive",
     summary: "Ajey Nagar hosted a 24-hour streaming session, collecting over 50 Lakhs for flood rehabilitation programs across Eastern India states.",
+    source: "Social Samosa",
+    tag: "Indian Creator Community"
+  },
+  {
+    title: "Tech Burner's 'Overlays' Brand Launches Recycled Tech Wear",
+    summary: "Shlok Srivastava released a new lineup of sustainable consumer merchandise designed from processed ocean plastics.",
+    source: "Indian Retailer",
+    tag: "Indian Creator Community"
+  },
+  {
+    title: "Sandeep Maheshwari Hosts Panel on Youth Career Stress Solutions",
+    summary: "The speaker brought together educators and psychologists to detail actionable ways for students to deal with exam pressures.",
+    source: "Education Times",
+    tag: "Indian Creator Community"
+  },
+  {
+    title: "CarryMinati Launches Satirical Parody Video on Short-Video Trends",
+    summary: "Ajey Nagar released a new comedic satire commenting on viral algorithms, racking up ten million views within hours of publication.",
     source: "Social Samosa",
     tag: "Indian Creator Community"
   }
@@ -294,16 +366,21 @@ const CHALLENGE_POOL: DailyChallenge[] = [
 
 // Export helpers to get daily seeded content
 export function getDailyNews(): DailyNews {
-  const wIdx = getSeededIndex(WORLD_NEWS_POOL.length, 0);
-  const iIdx = getSeededIndex(INDIA_TECH_NEWS_POOL.length, 1);
-  const jIdx = getSeededIndex(JK_NEWS_POOL.length, 2);
-  const yIdx = getSeededIndex(YOUTUBER_NEWS_POOL.length, 3);
+  const wIdx1 = getSeededIndex(WORLD_NEWS_POOL.length, 0);
+  const iIdx1 = getSeededIndex(INDIA_TECH_NEWS_POOL.length, 1);
+  const jIdx1 = getSeededIndex(JK_NEWS_POOL.length, 2);
+  const yIdx1 = getSeededIndex(YOUTUBER_NEWS_POOL.length, 3);
+
+  const wIdx2 = (wIdx1 + 1) % WORLD_NEWS_POOL.length;
+  const iIdx2 = (iIdx1 + 1) % INDIA_TECH_NEWS_POOL.length;
+  const jIdx2 = (jIdx1 + 1) % JK_NEWS_POOL.length;
+  const yIdx2 = (yIdx1 + 1) % YOUTUBER_NEWS_POOL.length;
 
   return {
-    worldNews: WORLD_NEWS_POOL[wIdx],
-    indiaTechNews: INDIA_TECH_NEWS_POOL[iIdx],
-    jkNews: JK_NEWS_POOL[jIdx],
-    youtuberNews: YOUTUBER_NEWS_POOL[yIdx]
+    worldNews: [WORLD_NEWS_POOL[wIdx1], WORLD_NEWS_POOL[wIdx2]],
+    indiaTechNews: [INDIA_TECH_NEWS_POOL[iIdx1], INDIA_TECH_NEWS_POOL[iIdx2]],
+    jkNews: [JK_NEWS_POOL[jIdx1], JK_NEWS_POOL[jIdx2]],
+    youtuberNews: [YOUTUBER_NEWS_POOL[yIdx1], YOUTUBER_NEWS_POOL[yIdx2]]
   };
 }
 

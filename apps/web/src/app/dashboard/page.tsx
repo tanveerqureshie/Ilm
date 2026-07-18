@@ -17,7 +17,7 @@ import {
   Calendar
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { getDailyNews, getDailyConcepts, getDailyVocab, getDailyChallenge } from "../../utils/dailyContent";
+import { getDailyNews, getDailyConcepts, getDailyVocab, getDailyChallenge, DailyNews, DailyConcepts, DailyVocab, DailyChallenge } from "../../utils/dailyContent";
 
 export default function DashboardPage() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -37,10 +37,10 @@ export default function DashboardPage() {
   const [bookmarkedList, setBookmarkedList] = useState<string[]>([]);
 
   // Seeded daily content
-  const [dailyNews, setDailyNews] = useState<any>(null);
-  const [dailyConcepts, setDailyConcepts] = useState<any>(null);
-  const [dailyVocab, setDailyVocab] = useState<any>(null);
-  const [dailyChallenge, setDailyChallenge] = useState<any>(null);
+  const [dailyNews, setDailyNews] = useState<DailyNews | null>(null);
+  const [dailyConcepts, setDailyConcepts] = useState<DailyConcepts | null>(null);
+  const [dailyVocab, setDailyVocab] = useState<DailyVocab | null>(null);
+  const [dailyChallenge, setDailyChallenge] = useState<DailyChallenge | null>(null);
 
   useEffect(() => {
     // Read daily content
@@ -251,7 +251,7 @@ export default function DashboardPage() {
           </div>
 
           {/* RIGHT SIDE (Vertical Connected Story Thread) */}
-          <div className="lg:col-span-8 space-y-2">
+          <div className="lg:col-span-8 space-y-2 max-w-3xl w-full">
             
             <div className="text-center py-4">
               <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Seeded Feed</span>
@@ -269,43 +269,55 @@ export default function DashboardPage() {
                 }`} />
               </div>
 
-              <motion.div 
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                className="soft-glass-outset rounded-2xl p-6 border-border/20"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">{dailyNews.worldNews.tag}</span>
-                  <button 
-                    onClick={() => toggleBookmark(dailyNews.worldNews.title)}
-                    className="p-1.5 rounded hover:bg-secondary/40 text-muted-foreground transition-colors"
-                  >
-                    {bookmarkedList.includes(dailyNews.worldNews.title) ? (
-                      <BookmarkCheck className="h-4.5 w-4.5 text-primary" />
-                    ) : (
-                      <Bookmark className="h-4.5 w-4.5" />
-                    )}
-                  </button>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {dailyNews.worldNews.map((newsItem) => (
+                    <motion.div 
+                      key={newsItem.title}
+                      initial={{ opacity: 0, y: 15 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-100px" }}
+                      className="soft-glass-outset rounded-2xl p-5 border-border/20 flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">{newsItem.tag}</span>
+                          <button 
+                            onClick={() => toggleBookmark(newsItem.title)}
+                            className="p-1.5 rounded hover:bg-secondary/40 text-muted-foreground transition-colors"
+                          >
+                            {bookmarkedList.includes(newsItem.title) ? (
+                              <BookmarkCheck className="h-4.5 w-4.5 text-primary" />
+                            ) : (
+                              <Bookmark className="h-4.5 w-4.5" />
+                            )}
+                          </button>
+                        </div>
+                        <h4 className="text-md font-bold font-serif mb-2 leading-snug">{newsItem.title}</h4>
+                        <p className="text-xs text-muted-foreground leading-relaxed mb-4">{newsItem.summary}</p>
+                      </div>
+                      <div className="flex items-center justify-between border-t border-border/10 pt-3 mt-auto">
+                        <span className="text-[9px] text-muted-foreground font-medium">Source: {newsItem.source}</span>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-                <h4 className="text-lg font-bold font-serif mb-2">{dailyNews.worldNews.title}</h4>
-                <p className="text-xs text-muted-foreground leading-relaxed mb-4">{dailyNews.worldNews.summary}</p>
-                <div className="flex items-center justify-between border-t border-border/10 pt-3">
-                  <span className="text-[10px] text-muted-foreground font-medium">Source: {dailyNews.worldNews.source}</span>
+
+                <div className="flex justify-end pr-2">
                   {!sessionProgress[0] ? (
                     <button 
                       onClick={() => markStepComplete(0)}
-                      className="flex items-center gap-1 text-[10px] font-bold text-primary hover:translate-x-0.5 transition-transform"
+                      className="flex items-center gap-1.5 text-xs font-bold text-primary hover:translate-x-0.5 transition-transform"
                     >
-                      Mark as Read <ArrowRight className="h-3 w-3" />
+                      Mark Category as Read <ArrowRight className="h-4 w-4" />
                     </button>
                   ) : (
-                    <span className="flex items-center gap-1 text-[10px] text-emerald-500 font-bold">
-                      <CheckCircle2 className="h-3.5 w-3.5" /> Completed
+                    <span className="flex items-center gap-1.5 text-xs text-emerald-500 font-bold">
+                      <CheckCircle2 className="h-4.5 w-4.5" /> Completed
                     </span>
                   )}
                 </div>
-              </motion.div>
+              </div>
 
               <div className="absolute left-0 bottom-0 -translate-x-[50%] translate-y-[50%] flex flex-col items-center z-10">
                 <ArrowDown className="h-4 w-4 text-muted-foreground/40 animate-bounce" />
@@ -320,43 +332,55 @@ export default function DashboardPage() {
                 }`} />
               </div>
 
-              <motion.div 
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                className="soft-glass-outset rounded-2xl p-6 border-border/20"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">{dailyNews.indiaTechNews.tag}</span>
-                  <button 
-                    onClick={() => toggleBookmark(dailyNews.indiaTechNews.title)}
-                    className="p-1.5 rounded hover:bg-secondary/40 text-muted-foreground transition-colors"
-                  >
-                    {bookmarkedList.includes(dailyNews.indiaTechNews.title) ? (
-                      <BookmarkCheck className="h-4.5 w-4.5 text-primary" />
-                    ) : (
-                      <Bookmark className="h-4.5 w-4.5" />
-                    )}
-                  </button>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {dailyNews.indiaTechNews.map((newsItem) => (
+                    <motion.div 
+                      key={newsItem.title}
+                      initial={{ opacity: 0, y: 15 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-100px" }}
+                      className="soft-glass-outset rounded-2xl p-5 border-border/20 flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">{newsItem.tag}</span>
+                          <button 
+                            onClick={() => toggleBookmark(newsItem.title)}
+                            className="p-1.5 rounded hover:bg-secondary/40 text-muted-foreground transition-colors"
+                          >
+                            {bookmarkedList.includes(newsItem.title) ? (
+                              <BookmarkCheck className="h-4.5 w-4.5 text-primary" />
+                            ) : (
+                              <Bookmark className="h-4.5 w-4.5" />
+                            )}
+                          </button>
+                        </div>
+                        <h4 className="text-md font-bold font-serif mb-2 leading-snug">{newsItem.title}</h4>
+                        <p className="text-xs text-muted-foreground leading-relaxed mb-4">{newsItem.summary}</p>
+                      </div>
+                      <div className="flex items-center justify-between border-t border-border/10 pt-3 mt-auto">
+                        <span className="text-[9px] text-muted-foreground font-medium">Source: {newsItem.source}</span>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-                <h4 className="text-lg font-bold font-serif mb-2">{dailyNews.indiaTechNews.title}</h4>
-                <p className="text-xs text-muted-foreground leading-relaxed mb-4">{dailyNews.indiaTechNews.summary}</p>
-                <div className="flex items-center justify-between border-t border-border/10 pt-3">
-                  <span className="text-[10px] text-muted-foreground font-medium">Source: {dailyNews.indiaTechNews.source}</span>
+
+                <div className="flex justify-end pr-2">
                   {!sessionProgress[1] ? (
                     <button 
                       onClick={() => markStepComplete(1)}
-                      className="flex items-center gap-1 text-[10px] font-bold text-primary hover:translate-x-0.5 transition-transform"
+                      className="flex items-center gap-1.5 text-xs font-bold text-primary hover:translate-x-0.5 transition-transform"
                     >
-                      Mark as Read <ArrowRight className="h-3 w-3" />
+                      Mark Category as Read <ArrowRight className="h-4 w-4" />
                     </button>
                   ) : (
-                    <span className="flex items-center gap-1 text-[10px] text-emerald-500 font-bold">
-                      <CheckCircle2 className="h-3.5 w-3.5" /> Completed
+                    <span className="flex items-center gap-1.5 text-xs text-emerald-500 font-bold">
+                      <CheckCircle2 className="h-4.5 w-4.5" /> Completed
                     </span>
                   )}
                 </div>
-              </motion.div>
+              </div>
 
               <div className="absolute left-0 bottom-0 -translate-x-[50%] translate-y-[50%] flex flex-col items-center z-10">
                 <ArrowDown className="h-4 w-4 text-muted-foreground/40" />
@@ -371,43 +395,55 @@ export default function DashboardPage() {
                 }`} />
               </div>
 
-              <motion.div 
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                className="soft-glass-outset rounded-2xl p-6 border-border/20"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">{dailyNews.jkNews.tag}</span>
-                  <button 
-                    onClick={() => toggleBookmark(dailyNews.jkNews.title)}
-                    className="p-1.5 rounded hover:bg-secondary/40 text-muted-foreground transition-colors"
-                  >
-                    {bookmarkedList.includes(dailyNews.jkNews.title) ? (
-                      <BookmarkCheck className="h-4.5 w-4.5 text-primary" />
-                    ) : (
-                      <Bookmark className="h-4.5 w-4.5" />
-                    )}
-                  </button>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {dailyNews.jkNews.map((newsItem) => (
+                    <motion.div 
+                      key={newsItem.title}
+                      initial={{ opacity: 0, y: 15 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-100px" }}
+                      className="soft-glass-outset rounded-2xl p-5 border-border/20 flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">{newsItem.tag}</span>
+                          <button 
+                            onClick={() => toggleBookmark(newsItem.title)}
+                            className="p-1.5 rounded hover:bg-secondary/40 text-muted-foreground transition-colors"
+                          >
+                            {bookmarkedList.includes(newsItem.title) ? (
+                              <BookmarkCheck className="h-4.5 w-4.5 text-primary" />
+                            ) : (
+                              <Bookmark className="h-4.5 w-4.5" />
+                            )}
+                          </button>
+                        </div>
+                        <h4 className="text-md font-bold font-serif mb-2 leading-snug">{newsItem.title}</h4>
+                        <p className="text-xs text-muted-foreground leading-relaxed mb-4">{newsItem.summary}</p>
+                      </div>
+                      <div className="flex items-center justify-between border-t border-border/10 pt-3 mt-auto">
+                        <span className="text-[9px] text-muted-foreground font-medium">Source: {newsItem.source}</span>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-                <h4 className="text-lg font-bold font-serif mb-2">{dailyNews.jkNews.title}</h4>
-                <p className="text-xs text-muted-foreground leading-relaxed mb-4">{dailyNews.jkNews.summary}</p>
-                <div className="flex items-center justify-between border-t border-border/10 pt-3">
-                  <span className="text-[10px] text-muted-foreground font-medium">Source: {dailyNews.jkNews.source}</span>
+
+                <div className="flex justify-end pr-2">
                   {!sessionProgress[2] ? (
                     <button 
                       onClick={() => markStepComplete(2)}
-                      className="flex items-center gap-1 text-[10px] font-bold text-primary hover:translate-x-0.5 transition-transform"
+                      className="flex items-center gap-1.5 text-xs font-bold text-primary hover:translate-x-0.5 transition-transform"
                     >
-                      Mark as Read <ArrowRight className="h-3 w-3" />
+                      Mark Category as Read <ArrowRight className="h-4 w-4" />
                     </button>
                   ) : (
-                    <span className="flex items-center gap-1 text-[10px] text-emerald-500 font-bold">
-                      <CheckCircle2 className="h-3.5 w-3.5" /> Completed
+                    <span className="flex items-center gap-1.5 text-xs text-emerald-500 font-bold">
+                      <CheckCircle2 className="h-4.5 w-4.5" /> Completed
                     </span>
                   )}
                 </div>
-              </motion.div>
+              </div>
 
               <div className="absolute left-0 bottom-0 -translate-x-[50%] translate-y-[50%] flex flex-col items-center z-10">
                 <ArrowDown className="h-4 w-4 text-muted-foreground/40" />
@@ -422,43 +458,55 @@ export default function DashboardPage() {
                 }`} />
               </div>
 
-              <motion.div 
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                className="soft-glass-outset rounded-2xl p-6 border-border/20"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">{dailyNews.youtuberNews.tag}</span>
-                  <button 
-                    onClick={() => toggleBookmark(dailyNews.youtuberNews.title)}
-                    className="p-1.5 rounded hover:bg-secondary/40 text-muted-foreground transition-colors"
-                  >
-                    {bookmarkedList.includes(dailyNews.youtuberNews.title) ? (
-                      <BookmarkCheck className="h-4.5 w-4.5 text-primary" />
-                    ) : (
-                      <Bookmark className="h-4.5 w-4.5" />
-                    )}
-                  </button>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {dailyNews.youtuberNews.map((newsItem) => (
+                    <motion.div 
+                      key={newsItem.title}
+                      initial={{ opacity: 0, y: 15 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-100px" }}
+                      className="soft-glass-outset rounded-2xl p-5 border-border/20 flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">{newsItem.tag}</span>
+                          <button 
+                            onClick={() => toggleBookmark(newsItem.title)}
+                            className="p-1.5 rounded hover:bg-secondary/40 text-muted-foreground transition-colors"
+                          >
+                            {bookmarkedList.includes(newsItem.title) ? (
+                              <BookmarkCheck className="h-4.5 w-4.5 text-primary" />
+                            ) : (
+                              <Bookmark className="h-4.5 w-4.5" />
+                            )}
+                          </button>
+                        </div>
+                        <h4 className="text-md font-bold font-serif mb-2 leading-snug">{newsItem.title}</h4>
+                        <p className="text-xs text-muted-foreground leading-relaxed mb-4">{newsItem.summary}</p>
+                      </div>
+                      <div className="flex items-center justify-between border-t border-border/10 pt-3 mt-auto">
+                        <span className="text-[9px] text-muted-foreground font-medium">Source: {newsItem.source}</span>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-                <h4 className="text-lg font-bold font-serif mb-2">{dailyNews.youtuberNews.title}</h4>
-                <p className="text-xs text-muted-foreground leading-relaxed mb-4">{dailyNews.youtuberNews.summary}</p>
-                <div className="flex items-center justify-between border-t border-border/10 pt-3">
-                  <span className="text-[10px] text-muted-foreground font-medium">Source: {dailyNews.youtuberNews.source}</span>
+
+                <div className="flex justify-end pr-2">
                   {!sessionProgress[3] ? (
                     <button 
                       onClick={() => markStepComplete(3)}
-                      className="flex items-center gap-1 text-[10px] font-bold text-primary hover:translate-x-0.5 transition-transform"
+                      className="flex items-center gap-1.5 text-xs font-bold text-primary hover:translate-x-0.5 transition-transform"
                     >
-                      Mark as Read <ArrowRight className="h-3 w-3" />
+                      Mark Category as Read <ArrowRight className="h-4 w-4" />
                     </button>
                   ) : (
-                    <span className="flex items-center gap-1 text-[10px] text-emerald-500 font-bold">
-                      <CheckCircle2 className="h-3.5 w-3.5" /> Completed
+                    <span className="flex items-center gap-1.5 text-xs text-emerald-500 font-bold">
+                      <CheckCircle2 className="h-4.5 w-4.5" /> Completed
                     </span>
                   )}
                 </div>
-              </motion.div>
+              </div>
 
               <div className="absolute left-0 bottom-0 -translate-x-[50%] translate-y-[50%] flex flex-col items-center z-10">
                 <ArrowDown className="h-4 w-4 text-muted-foreground/40" />

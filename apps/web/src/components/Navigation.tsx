@@ -32,7 +32,7 @@ export default function Navigation() {
   ];
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-lg">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-lg lg:hidden">
       <nav className="flex items-center justify-around py-2 px-3 bg-card/85 border border-border backdrop-blur-md rounded-full shadow-lg shadow-black/[0.04] dark:shadow-white/[0.02]">
         {links.map((link) => {
           const isActive = pathname === link.href;

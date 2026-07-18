@@ -3,6 +3,8 @@ import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import AiChatbox from "@/components/AiChatbox";
+import ThemeInitializer from "@/components/ThemeInitializer";
+import Sidebar from "@/components/Sidebar";
 
 const playfair = Playfair_Display({
   variable: "--font-serif",
@@ -30,7 +32,13 @@ export default function RootLayout({
       className={`${playfair.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground antialiased selection:bg-primary/10 selection:text-primary">
-        {children}
+        <ThemeInitializer />
+        <div className="lg:flex lg:h-screen lg:overflow-hidden w-full">
+          <Sidebar />
+          <div className="lg:flex-1 lg:h-screen lg:overflow-y-auto flex flex-col">
+            {children}
+          </div>
+        </div>
         <Navigation />
         <AiChatbox />
       </body>
