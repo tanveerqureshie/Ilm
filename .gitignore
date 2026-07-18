@@ -30,3 +30,8 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 *.tsbuildinfo
+
+# Databases
+*.db
+*.db-journal
+*.sqlite

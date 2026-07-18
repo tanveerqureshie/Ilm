@@ -1,41 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fbfaf7; /* High-end Creamy White */
-  --foreground: #0c0b0a;
-  --card: #ffffff;
-  --card-foreground: #0c0b0a;
-  --border: #e8e5de; /* Soft warm grey border */
-  --primary: #0c0b0a; /* Premium Black */
-  --primary-foreground: #fbfaf7;
-  --secondary: #efece6;
-  --secondary-foreground: #2d2925;
-  --muted: #8c867c;
-  --muted-foreground: #5e574f;
-  --ring: rgba(12, 11, 10, 0.1);
-  --radius: 8px; /* Slightly sharper, modern corners */
+  --background: #faf9f6; /* High-end Warm Creamy White */
+  --foreground: #080808;
+  --card: rgba(255, 255, 255, 0.65); /* Translucent glass card */
+  --card-foreground: #080808;
+  --border: rgba(255, 107, 53, 0.12); /* Subtle Orange tinted border */
+  --primary: #ff6b35; /* Vibrant high-end Orange (#ff6b35) */
+  --primary-foreground: #ffffff;
+  --secondary: rgba(255, 107, 53, 0.05); /* Light orange secondary fill */
+  --secondary-foreground: #080808;
+  --muted: #78716c;
+  --muted-foreground: #57534e;
+  --ring: rgba(255, 107, 53, 0.25);
+  --radius: 12px; /* Smoother premium rounded corners */
 }
 
 .dark {
-  --background: #0a0a09; /* Obsidian Black */
-  --foreground: #f4f0ec;
-  --card: #121211;
-  --card-foreground: #f4f0ec;
-  --border: #22201e;
-  --primary: #f4f0ec; /* Clean White */
-  --primary-foreground: #0a0a09;
-  --secondary: #1a1917;
-  --secondary-foreground: #e4dcd3;
-  --muted: #5e574f;
-  --muted-foreground: #a69e94;
-  --ring: rgba(244, 240, 236, 0.1);
+  --background: #050505; /* Deep obsidian black */
+  --foreground: #f5f5f5;
+  --card: rgba(15, 15, 18, 0.65); /* Translucent dark glass card */
+  --card-foreground: #f5f5f5;
+  --border: rgba(255, 107, 53, 0.18); /* Glowing orange-tinted border */
+  --primary: #ff6b35; /* Vibrant high-end Orange */
+  --primary-foreground: #000000; /* Black text on orange for dark mode contrast */
+  --secondary: rgba(255, 107, 53, 0.08);
+  --secondary-foreground: #f5f5f5;
+  --muted: #a8a29e;
+  --muted-foreground: #78716c;
+  --ring: rgba(255, 107, 53, 0.4);
 }
 
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
+  --color-card-foreground: var(--color-card-foreground);
   --color-border: var(--border);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
@@ -57,10 +57,68 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(255, 107, 53, 0.03) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(255, 107, 53, 0.02) 0px, transparent 50%);
+  background-attachment: fixed;
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Custom Inshorts Scrolling Layout */
+/* Glassmorphism & Neumorphism Hybrid Classes */
+.glass-panel, .soft-glass-outset {
+  background-color: var(--card);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1.5px solid var(--border);
+  box-shadow: 
+    10px 10px 25px rgba(163, 177, 198, 0.45), 
+    -10px -10px 25px rgba(255, 255, 255, 0.95),
+    inset 1px 1px 0px rgba(255, 255, 255, 0.6);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .glass-panel, .dark .soft-glass-outset {
+  box-shadow: 
+    12px 12px 30px rgba(0, 0, 0, 0.65), 
+    -12px -12px 30px rgba(45, 45, 55, 0.35),
+    inset 1px 1px 0px rgba(255, 255, 255, 0.15);
+}
+
+.soft-glass-inset {
+  background-color: var(--card);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1.5px solid var(--border);
+  box-shadow: 
+    inset 6px 6px 14px rgba(163, 177, 198, 0.45), 
+    inset -6px -6px 14px rgba(255, 255, 255, 0.95);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .soft-glass-inset {
+  box-shadow: 
+    inset 6px 6px 14px rgba(0, 0, 0, 0.7), 
+    inset -6px -6px 14px rgba(45, 45, 55, 0.25);
+}
+
+.glass-panel-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 107, 53, 0.35);
+  box-shadow: 
+    8px 8px 24px rgba(163, 177, 198, 0.45), 
+    -8px -8px 24px rgba(255, 255, 255, 0.95),
+    inset 1px 1px 0px rgba(255, 255, 255, 0.6);
+}
+
+.dark .glass-panel-hover:hover {
+  border-color: rgba(255, 107, 53, 0.5);
+  box-shadow: 
+    8px 8px 24px rgba(0, 0, 0, 0.55), 
+    -8px -8px 24px rgba(45, 45, 55, 0.35),
+    inset 1px 1px 0px rgba(255, 255, 255, 0.15);
+}
+
+/* Custom Inshorts/Reels Scrolling Layout */
 .inshorts-deck {
   height: calc(100vh - 120px);
   overflow-y: scroll;
@@ -78,8 +136,8 @@ body {
 
 /* Micro-interactions */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -89,5 +147,10 @@ body {
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--muted);
+  background: var(--primary);
 }
+
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+

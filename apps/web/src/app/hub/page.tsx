@@ -229,16 +229,46 @@ const TRACKS_DATABASE: Record<string, {
   }
 };
 
+// Advanced Math Puzzle definitions
+interface MathPuzzle {
+  category: string;
+  question: string;
+  options: string[];
+  answer: string;
+  explanation: string;
+}
+
+const TRIGONOMETRY_BANK: MathPuzzle[] = [
+  { category: "Trigonometry", question: "Evaluate: sin(30°)", options: ["0", "1/2", "√3/2", "1"], answer: "1/2", explanation: "On the unit circle, sin(30°) is the vertical coordinate of the terminal point, which is exactly 1/2." },
+  { category: "Trigonometry", question: "Evaluate: cos(60°)", options: ["1/2", "√2/2", "√3/2", "0"], answer: "1/2", explanation: "Due to complementary angle relationships, cos(60°) is equivalent to sin(30°), which evaluates to 1/2." },
+  { category: "Trigonometry", question: "Evaluate: tan(45°)", options: ["0", "1/√3", "1", "√3"], answer: "1", explanation: "Since sin(45°) = cos(45°) = √2/2, their ratio tan(45°) is exactly 1." },
+  { category: "Trigonometry", question: "Simplify the identity: sin²(θ) + cos²(θ)", options: ["0", "1", "sin(2θ)", "sec²(θ)"], answer: "1", explanation: "This is the fundamental Pythagorean trigonometric identity derived directly from the unit circle equation x² + y² = 1." },
+  { category: "Trigonometry", question: "Evaluate: sec(60°)", options: ["1", "2", "√2", "2/√3"], answer: "2", explanation: "sec(θ) is the reciprocal of cos(θ). Since cos(60°) = 1/2, sec(60°) = 2." },
+  { category: "Trigonometry", question: "Evaluate: tan(60°)", options: ["1/√3", "1", "√3", "Undefined"], answer: "√3", explanation: "tan(60°) = sin(60°) / cos(60°) = (√3/2) / (1/2) = √3." }
+];
+
+const CALCULUS_BANK: MathPuzzle[] = [
+  { category: "Calculus", question: "Find the derivative: d/dx (x²)", options: ["x", "2x", "2", "x² / 2"], answer: "2x", explanation: "By the Power Rule d/dx (xⁿ) = n·xⁿ⁻¹, the derivative of x² is 2x." },
+  { category: "Calculus", question: "Find the derivative: d/dx (sin x)", options: ["cos x", "-cos x", "sin x", "-sin x"], answer: "cos x", explanation: "The rate of change of the sine function is exactly the cosine function: d/dx (sin x) = cos x." },
+  { category: "Calculus", question: "Evaluate the integral: ∫ 2x dx", options: ["x² + C", "2x² + C", "x + C", "2 + C"], answer: "x² + C", explanation: "By reversing the power rule, the antiderivative of 2x is x² plus the constant of integration C." },
+  { category: "Calculus", question: "Find the derivative: d/dx (e^x)", options: ["e^x", "xe^(x-1)", "ln(x)", "e^(x-1)"], answer: "e^x", explanation: "The exponential function base e is its own derivative. Thus, d/dx (e^x) = e^x." },
+  { category: "Calculus", question: "Evaluate: d/dx (3x³)", options: ["3x²", "9x²", "9x", "6x"], answer: "9x²", explanation: "By applying the Power Rule, d/dx (3x³) = 3 · 3x² = 9x²." }
+];
+
+const LOGARITHM_BANK: MathPuzzle[] = [
+  { category: "Logarithms", question: "Solve for x: log₂ (16) = x", options: ["2", "4", "8", "16"], answer: "4", answerIndex: 1, explanation: "Logarithm base 2 of 16 asks: 'To what power must 2 be raised to get 16?'. Since 2⁴ = 16, the answer is 4." } as any,
+  { category: "Logarithms", question: "Solve for x: log₁₀ (1000) = x", options: ["2", "3", "4", "10"], answer: "3", explanation: "Since 10³ = 1000, the logarithm base 10 of 1000 is exactly 3." },
+  { category: "Exponents", question: "Evaluate: 3⁴", options: ["12", "27", "64", "81"], answer: "81", explanation: "3⁴ is equal to 3 × 3 × 3 × 3, which computes to 81." }
+];
+
 export default function HubPage() {
   const [activeTab, setActiveTab] = useState<"learn" | "quiz" | "math">("learn");
   const [dayIdx, setDayIdx] = useState(0);
   const [userPreference, setUserPreference] = useState<string>("technology");
 
   // Math Puzzle states
-  const [mathNum1, setMathNum1] = useState(14);
-  const [mathNum2, setMathNum2] = useState(7);
-  const [mathOperator, setMathOperator] = useState("*");
-  const [mathInput, setMathInput] = useState("");
+  const [mathPuzzle, setMathPuzzle] = useState<MathPuzzle | null>(null);
+  const [selectedMathOption, setSelectedMathOption] = useState<string | null>(null);
   const [mathFeedback, setMathFeedback] = useState<"correct" | "incorrect" | null>(null);
   const [mathSolved, setMathSolved] = useState(0);
 
@@ -270,42 +300,81 @@ export default function HubPage() {
   const fact = currentTrackData.facts[dayIdx % currentTrackData.facts.length];
   const quizQuestions = currentTrackData.quizzes[dayIdx % currentTrackData.quizzes.length];
 
-  // Load new Math puzzle
+  // Dynamic Advanced Math Puzzle generator
   const generateMathPuzzle = () => {
-    const operators = ["+", "-", "*"];
-    const op = operators[Math.floor(Math.random() * operators.length)];
-    let n1 = 0, n2 = 0;
-    
-    if (op === "+") {
-      n1 = Math.floor(Math.random() * 80) + 20;
-      n2 = Math.floor(Math.random() * 80) + 20;
-    } else if (op === "-") {
-      n1 = Math.floor(Math.random() * 100) + 50;
-      n2 = Math.floor(Math.random() * 49) + 1;
-    } else {
-      n1 = Math.floor(Math.random() * 12) + 3;
-      n2 = Math.floor(Math.random() * 12) + 3;
-    }
-    
-    setMathNum1(n1);
-    setMathNum2(n2);
-    setMathOperator(op);
-    setMathInput("");
+    setSelectedMathOption(null);
     setMathFeedback(null);
+
+    // Pick a random category: Trigo, Calculus, Logs, Arithmetic
+    const choice = Math.floor(Math.random() * 4);
+    if (choice === 0) {
+      // Trigonometry
+      const p = TRIGONOMETRY_BANK[Math.floor(Math.random() * TRIGONOMETRY_BANK.length)];
+      setMathPuzzle(p);
+    } else if (choice === 1) {
+      // Calculus
+      const p = CALCULUS_BANK[Math.floor(Math.random() * CALCULUS_BANK.length)];
+      setMathPuzzle(p);
+    } else if (choice === 2) {
+      // Logarithm / Exponent
+      const p = LOGARITHM_BANK[Math.floor(Math.random() * LOGARITHM_BANK.length)];
+      setMathPuzzle(p);
+    } else {
+      // Programmatic Mental Arithmetic
+      const operators = ["+", "-", "×"];
+      const op = operators[Math.floor(Math.random() * operators.length)];
+      let n1 = 0, n2 = 0, correct = 0;
+      
+      if (op === "+") {
+        n1 = Math.floor(Math.random() * 60) + 15;
+        n2 = Math.floor(Math.random() * 60) + 15;
+        correct = n1 + n2;
+      } else if (op === "-") {
+        n1 = Math.floor(Math.random() * 80) + 30;
+        n2 = Math.floor(Math.random() * 29) + 5;
+        correct = n1 - n2;
+      } else {
+        n1 = Math.floor(Math.random() * 11) + 3;
+        n2 = Math.floor(Math.random() * 11) + 3;
+        correct = n1 * n2;
+      }
+
+      // Generate distractors
+      const distractors = new Set<string>();
+      distractors.add(correct.toString());
+      while (distractors.size < 4) {
+        const offset = (Math.floor(Math.random() * 7) + 1) * (Math.random() > 0.5 ? 1 : -1);
+        const dist = correct + offset;
+        if (dist > 0) distractors.add(dist.toString());
+      }
+      const optionsArray = Array.from(distractors).sort(() => Math.random() - 0.5);
+
+      setMathPuzzle({
+        category: "Mental Arithmetic",
+        question: `Evaluate: ${n1} ${op} ${n2}`,
+        options: optionsArray,
+        answer: correct.toString(),
+        explanation: `Simply calculate the values: ${n1} ${op} ${n2} equals exactly ${correct}.`
+      });
+    }
   };
 
-  const checkMathAnswer = (e: React.FormEvent) => {
-    e.preventDefault();
-    let correctAnswer = 0;
-    if (mathOperator === "+") correctAnswer = mathNum1 + mathNum2;
-    else if (mathOperator === "-") correctAnswer = mathNum1 - mathNum2;
-    else if (mathOperator === "*") correctAnswer = mathNum1 * mathNum2;
+  // Generate the first math question when switching to math tab
+  useEffect(() => {
+    if (activeTab === "math" && !mathPuzzle) {
+      generateMathPuzzle();
+    }
+  }, [activeTab]);
 
-    if (parseInt(mathInput) === correctAnswer) {
+  const handleSelectMathOption = (option: string) => {
+    if (selectedMathOption !== null || !mathPuzzle) return;
+    setSelectedMathOption(option);
+    
+    if (option === mathPuzzle.answer) {
       setMathFeedback("correct");
       setMathSolved(prev => prev + 1);
       
-      // Save math XP
+      // Grant XP
       const currentXp = parseInt(localStorage.getItem("ilm_v2_xp") || "350");
       const currentLvl = parseInt(localStorage.getItem("ilm_v2_level") || "1");
       let nextXp = currentXp + 50; // 50 XP per math puzzle
@@ -319,7 +388,7 @@ export default function HubPage() {
 
       setTimeout(() => {
         generateMathPuzzle();
-      }, 1200);
+      }, 1500);
     } else {
       setMathFeedback("incorrect");
     }
@@ -368,12 +437,12 @@ export default function HubPage() {
   return (
     <div className="flex-1 min-h-screen flex flex-col pb-36 bg-background text-foreground transition-all duration-300 font-sans">
       
-      {/* Standardized Header */}
-      <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="max-w-xl mx-auto px-4 h-16 flex items-center justify-between">
-          <span className="font-serif text-2xl font-extrabold tracking-tight">Ilm.</span>
+      {/* Header */}
+      <header className="sticky top-0 z-40 w-full border-b border-border bg-background/70 backdrop-blur-md">
+        <div className="max-w-xl mx-auto px-6 h-16 flex items-center justify-between">
+          <span className="font-serif text-2xl font-black tracking-tight text-primary">Ilm.</span>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+            <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
               <Link href="/about" className="hover:text-foreground transition-colors">About</Link>
               <Link href="/contact" className="hover:text-foreground transition-colors">Contact</Link>
             </div>
@@ -381,9 +450,9 @@ export default function HubPage() {
         </div>
       </header>
 
-      {/* Tab Headings */}
-      <div className="sticky top-16 z-30 w-full border-b border-border bg-background/90 py-1">
-        <div className="max-w-xl mx-auto px-4 h-12 flex items-center justify-around">
+      {/* Tab Selector */}
+      <div className="sticky top-16 z-30 w-full border-b border-border bg-background/80 py-1 backdrop-blur-md">
+        <div className="max-w-xl mx-auto px-6 h-12 flex items-center justify-around">
           {[
             { id: "learn", label: `Today's ${userPreference === "upsc" ? "Polity" : "Concept"}` },
             { id: "math", label: "Mental Math" },
@@ -404,59 +473,57 @@ export default function HubPage() {
         </div>
       </div>
 
-      {/* Content wrapper */}
-      <main className="flex-1 max-w-xl w-full mx-auto px-4 py-8 flex flex-col justify-center">
+      {/* Main Content */}
+      <main className="flex-1 max-w-xl w-full mx-auto px-6 py-8 flex flex-col justify-center">
         <AnimatePresence mode="wait">
           
-          {/* TAB 1: Learn new concept / Facts / Jokes */}
+          {/* TAB 1: Concept & Fact & Joke */}
           {activeTab === "learn" && concept && (
             <motion.div
               key="learn-tab"
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
+              exit={{ opacity: 0, y: -12 }}
               className="flex flex-col gap-6"
             >
-              {/* Card: Daily Concept */}
-              <div className="rounded-xl border border-border bg-card p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
-                <div className="flex items-center justify-between mb-4 pb-2 border-b border-border/40">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-foreground border border-border uppercase tracking-wider">
+              {/* Daily Concept Card */}
+              <div className="glass-panel rounded-2xl p-6 shadow-sm relative overflow-hidden">
+                <div className="flex items-center justify-between mb-4 pb-2.5 border-b border-border/30">
+                  <span className="text-[9px] font-black px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/25 uppercase tracking-wider">
                     {concept.category}
                   </span>
-                  <span className="text-xs font-bold text-muted-foreground">Tailored suggestion ({userPreference})</span>
+                  <span className="text-[10px] font-bold text-muted-foreground">Track: {userPreference}</span>
                 </div>
-                <h2 className="text-xl font-extrabold tracking-tight font-serif mb-3 leading-snug">
+                <h2 className="text-xl font-serif font-black tracking-tight mb-3 leading-snug">
                   {concept.title}
                 </h2>
-                <p className="text-sm leading-relaxed text-foreground/90 font-sans font-medium mb-4">
+                <p className="text-xs sm:text-sm leading-relaxed text-foreground/90 font-medium mb-4">
                   {concept.body}
                 </p>
-                <div className="p-3 bg-secondary/60 rounded-lg border border-border/50 text-xs">
-                  <span className="font-bold block text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Key Takeaway</span>
-                  <p className="font-semibold text-foreground">{concept.takeaway}</p>
+                <div className="p-3 bg-secondary/50 rounded-xl border border-border/40 text-[11px] font-semibold leading-relaxed text-foreground">
+                  <span className="font-extrabold block text-[9px] text-muted-foreground uppercase tracking-widest mb-0.5">Key Takeaway</span>
+                  {concept.takeaway}
                 </div>
               </div>
 
-              {/* Grid: Fact & Joke */}
+              {/* Fact and Joke Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Fact card */}
                 {fact && (
-                  <div className="rounded-xl border border-border bg-card p-5 flex flex-col justify-between shadow-sm">
+                  <div className="glass-panel rounded-2xl p-5 flex flex-col justify-between shadow-sm">
                     <div>
-                      <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest block mb-2">Scientific Fact</span>
+                      <span className="text-[8px] font-black text-primary uppercase tracking-widest block mb-2">Scientific Fact</span>
                       <p className="text-xs leading-relaxed text-foreground font-semibold">
                         &ldquo;{fact.content}&rdquo;
                       </p>
                     </div>
-                    <span className="text-[9px] text-muted-foreground block mt-3">Source: {fact.source}</span>
+                    <span className="text-[8px] text-muted-foreground font-semibold block mt-3">Source: {fact.source}</span>
                   </div>
                 )}
 
-                {/* Joke card */}
                 {joke && (
-                  <div className="rounded-xl border border-border bg-card p-5 flex flex-col justify-between shadow-sm">
+                  <div className="glass-panel rounded-2xl p-5 flex flex-col justify-between shadow-sm">
                     <div>
-                      <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest block mb-2">Daily Chuckle</span>
+                      <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest block mb-2">Daily Chuckle</span>
                       <p className="text-xs font-semibold text-foreground leading-relaxed">
                         {joke.setup}
                       </p>
@@ -470,96 +537,125 @@ export default function HubPage() {
             </motion.div>
           )}
 
-          {/* TAB 2: Mental Math Game */}
-          {activeTab === "math" && (
+          {/* TAB 2: Mental Math (Calculus, Trig, Log, Arithmetic) */}
+          {activeTab === "math" && mathPuzzle && (
             <motion.div
               key="math-tab"
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              className="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col justify-between min-h-[360px]"
+              exit={{ opacity: 0, y: -12 }}
+              className="glass-panel rounded-2xl p-6 flex flex-col justify-between min-h-[380px]"
             >
-              <div className="flex items-center justify-between pb-3 border-b border-border/40 mb-6">
-                <span className="text-xs font-bold text-muted-foreground uppercase">Speed Maths</span>
-                <span className="text-xs font-bold font-mono">Solved: {mathSolved}</span>
-              </div>
-
-              <div className="flex-1 flex flex-col justify-center items-center gap-6 my-auto">
-                <div className="flex items-center gap-4 text-3xl sm:text-4xl font-extrabold font-mono tracking-wider">
-                  <span>{mathNum1}</span>
-                  <span className="text-primary">{mathOperator === "*" ? "×" : mathOperator}</span>
-                  <span>{mathNum2}</span>
-                  <span>=</span>
-                  <span className="text-muted-foreground">?</span>
+              <div>
+                <div className="flex items-center justify-between pb-3 border-b border-border/30 mb-5">
+                  <span className="text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/25">
+                    {mathPuzzle.category}
+                  </span>
+                  <span className="text-xs font-bold font-mono text-muted-foreground">Solved: {mathSolved}</span>
                 </div>
 
-                <form onSubmit={checkMathAnswer} className="w-full max-w-xs flex gap-2">
-                  <input
-                    type="number"
-                    placeholder="Enter answer"
-                    value={mathInput}
-                    onChange={(e) => setMathInput(e.target.value)}
-                    disabled={mathFeedback === "correct"}
-                    className="flex-1 px-4 py-2.5 rounded-lg border border-border bg-background font-mono text-center text-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                    required
-                    autoFocus
-                  />
-                  <button
-                    type="submit"
-                    className="px-5 py-2.5 font-bold text-sm bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-all flex items-center justify-center shrink-0"
+                <div className="flex flex-col items-center justify-center gap-6 my-6">
+                  {/* Large Math question */}
+                  <h3 className="text-2xl sm:text-3xl font-serif font-black text-center text-foreground leading-relaxed select-none">
+                    {mathPuzzle.question}
+                  </h3>
+
+                  {/* Multiple Choice Option Grid */}
+                  <div className="grid grid-cols-2 gap-3 w-full mt-2">
+                    {mathPuzzle.options.map((opt) => {
+                      const isCorrect = opt === mathPuzzle.answer;
+                      const isSelected = selectedMathOption === opt;
+                      const hasSelected = selectedMathOption !== null;
+
+                      let buttonStyles = "border-border hover:bg-secondary/40";
+                      if (hasSelected) {
+                        if (isCorrect) {
+                          buttonStyles = "bg-green-500/10 border-green-500 text-green-700 dark:text-green-400";
+                        } else if (isSelected) {
+                          buttonStyles = "bg-red-500/10 border-red-500 text-red-700 dark:text-red-400";
+                        } else {
+                          buttonStyles = "opacity-40 border-border";
+                        }
+                      }
+
+                      return (
+                        <button
+                          key={opt}
+                          onClick={() => handleSelectMathOption(opt)}
+                          disabled={hasSelected}
+                          className={`w-full text-center py-4 font-mono font-bold text-sm sm:text-base rounded-xl border transition-all flex items-center justify-center gap-2 ${buttonStyles}`}
+                        >
+                          <span>{opt}</span>
+                          {hasSelected && isCorrect && <Check className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />}
+                          {hasSelected && isSelected && !isCorrect && <X className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Feedback summary */}
+                  <div className="h-8 flex items-center justify-center text-center">
+                    {mathFeedback === "correct" && (
+                      <motion.span initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="text-xs font-bold text-green-600 flex items-center gap-1">
+                        <Check className="h-4 w-4" /> Correct! +50 XP and Loading next...
+                      </motion.span>
+                    )}
+                    {mathFeedback === "incorrect" && (
+                      <motion.span initial={{ x: -10 }} animate={{ x: [0, -10, 10, -10, 0] }} className="text-xs font-bold text-red-600 flex items-center gap-1">
+                        <X className="h-4 w-4" /> Incorrect. Try a different option!
+                      </motion.span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Explanations shown after answering */}
+              <AnimatePresence>
+                {selectedMathOption && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    className="p-3 bg-secondary/40 border border-border/40 rounded-xl text-[10px] leading-relaxed mb-4"
                   >
-                    Check
-                  </button>
-                </form>
+                    <span className="font-extrabold block text-muted-foreground uppercase text-[9px] mb-0.5">Explanation</span>
+                    {mathPuzzle.explanation}
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-                {/* Animated status indicators */}
-                <div className="h-6">
-                  {mathFeedback === "correct" && (
-                    <motion.span initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="text-xs font-bold text-green-600 flex items-center gap-1">
-                      <Check className="h-4 w-4" /> Correct! Next equation loading...
-                    </motion.span>
-                  )}
-                  {mathFeedback === "incorrect" && (
-                    <motion.span initial={{ x: -10 }} animate={{ x: [0, -10, 10, -10, 0] }} className="text-xs font-bold text-red-600 flex items-center gap-1">
-                      <X className="h-4 w-4" /> Incorrect. Try again!
-                    </motion.span>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex justify-center pt-4 border-t border-border/40 mt-6">
+              <div className="flex justify-center pt-3 border-t border-border/30 mt-4">
                 <button
                   onClick={generateMathPuzzle}
-                  className="text-xs font-bold text-muted-foreground hover:text-primary flex items-center gap-1"
+                  className="text-[10px] font-extrabold text-muted-foreground hover:text-primary flex items-center gap-1 uppercase tracking-wider"
                 >
-                  <RefreshCw className="h-3.5 w-3.5" /> Skip / New Equation
+                  <RefreshCw className="h-3 w-3" /> Skip to New Formula
                 </button>
               </div>
             </motion.div>
           )}
 
-          {/* TAB 3: Interactive Daily Quiz */}
+          {/* TAB 3: Quiz questions */}
           {activeTab === "quiz" && quizQuestions && (
             <motion.div
               key="quiz-tab"
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              className="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col justify-between min-h-[380px]"
+              exit={{ opacity: 0, y: -12 }}
+              className="glass-panel rounded-2xl p-6 flex flex-col justify-between min-h-[380px]"
             >
               {!quizFinished ? (
                 <>
-                  <div className="flex items-center justify-between pb-3 border-b border-border/40 mb-4">
-                    <span className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-1">
-                      <BrainCircuit className="h-4 w-4 text-primary" /> {userPreference.toUpperCase()} Learning Quiz
+                  <div className="flex items-center justify-between pb-3 border-b border-border/30 mb-4">
+                    <span className="text-[9px] font-black uppercase tracking-wider flex items-center gap-1.5 text-primary">
+                      <BrainCircuit className="h-4 w-4" /> {userPreference.toUpperCase()} Daily Quiz
                     </span>
-                    <span className="text-xs font-bold font-mono">
-                      Question {currentQuizIndex + 1} / {quizQuestions.length}
+                    <span className="text-xs font-bold font-mono text-muted-foreground">
+                      {currentQuizIndex + 1} / {quizQuestions.length}
                     </span>
                   </div>
 
                   <div className="flex-1 flex flex-col gap-4 justify-center my-2">
-                    <h3 className="text-base sm:text-lg font-bold text-foreground leading-snug">
+                    <h3 className="text-sm sm:text-base font-serif font-black text-foreground leading-snug">
                       {quizQuestions[currentQuizIndex].question}
                     </h3>
 
@@ -576,7 +672,7 @@ export default function HubPage() {
                           } else if (isSelected) {
                             buttonStyles = "bg-red-500/10 border-red-500 text-red-700 dark:text-red-400";
                           } else {
-                            buttonStyles = "opacity-50 border-border";
+                            buttonStyles = "opacity-40 border-border";
                           }
                         }
 
@@ -585,7 +681,7 @@ export default function HubPage() {
                             key={idx}
                             onClick={() => handleSelectOption(idx)}
                             disabled={hasSelectedAny}
-                            className={`w-full text-left p-3.5 text-xs sm:text-sm font-semibold rounded-lg border transition-all flex items-center justify-between ${buttonStyles}`}
+                            className={`w-full text-left p-3.5 text-xs sm:text-sm font-semibold rounded-xl border transition-all flex items-center justify-between ${buttonStyles}`}
                           >
                             <span>{opt}</span>
                             {hasSelectedAny && isCorrect && <Check className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />}
@@ -600,20 +696,20 @@ export default function HubPage() {
                         <motion.div
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: "auto" }}
-                          className="p-3 bg-secondary/40 rounded border border-border/50 text-[11px] leading-relaxed mt-2"
+                          className="p-3 bg-secondary/40 border border-border/40 rounded-xl text-[10px] leading-relaxed mt-2"
                         >
-                          <span className="font-bold block text-muted-foreground uppercase text-[9px] mb-1">Explanation</span>
+                          <span className="font-extrabold block text-muted-foreground uppercase text-[9px] mb-0.5">Explanation</span>
                           {quizQuestions[currentQuizIndex].explanation}
                         </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
 
-                  <div className="border-t border-border/40 pt-4 mt-6 flex justify-end">
+                  <div className="border-t border-border/30 pt-4 mt-6 flex justify-end">
                     <button
                       onClick={handleNextQuiz}
                       disabled={selectedOption === null}
-                      className="px-5 py-2 text-xs font-bold bg-primary text-primary-foreground rounded-full hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                      className="px-5 py-2.5 text-[10px] font-bold bg-primary text-primary-foreground rounded-full hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all uppercase tracking-wider"
                     >
                       {currentQuizIndex < quizQuestions.length - 1 ? "Next Question" : "Finish Quiz"}
                     </button>
@@ -625,15 +721,15 @@ export default function HubPage() {
                     <Trophy className="h-8 w-8" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold font-serif">Quiz Completed!</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <h3 className="text-xl font-serif font-black text-foreground">Quiz Completed!</h3>
+                    <p className="text-xs text-muted-foreground mt-1 font-semibold">
                       You scored {quizScore} out of {quizQuestions.length} correctly.
                     </p>
                   </div>
 
                   <button
                     onClick={resetQuiz}
-                    className="px-6 py-2.5 font-bold text-xs bg-primary text-primary-foreground rounded-full hover:opacity-90 active:scale-95 transition-all"
+                    className="px-6 py-2.5 font-bold text-[10px] uppercase tracking-wider bg-primary text-primary-foreground rounded-full hover:opacity-90 active:scale-95 transition-all"
                   >
                     Retake Quiz
                   </button>

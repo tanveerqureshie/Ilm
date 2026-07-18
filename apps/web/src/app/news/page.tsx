@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Sparkles, ArrowUp, ArrowDown, Bookmark, Newspaper, BookmarkCheck, Sun, Moon } from "lucide-react";
+import { Sparkles, Bookmark, Newspaper, BookmarkCheck, Sun, Moon, ArrowDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const ALL_NEWS_DATABASE = [
@@ -145,11 +145,11 @@ const ALL_NEWS_DATABASE = [
 
 export default function NewsPage() {
   const [selectedCategory, setSelectedCategory] = useState("For You");
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [savedNews, setSavedNews] = useState<string[]>([]);
-  const [showAiSummary, setShowAiSummary] = useState<string | null>(null);
+  const [expandedAiStoryId, setExpandedAiStoryId] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [userPreference, setUserPreference] = useState<string>("technology");
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const categories = ["For You", "All", "Tech", "AI", "UPSC", "Medical", "India", "YouTube", "Saved"];
 
@@ -191,7 +191,7 @@ export default function NewsPage() {
   };
 
   const handleToggleAi = (id: string) => {
-    setShowAiSummary((prev) => (prev === id ? null : id));
+    setExpandedAiStoryId((prev) => (prev === id ? null : id));
   };
 
   // Filter based on active category and user learning track preferences
@@ -214,60 +214,46 @@ export default function NewsPage() {
     return art.tag.toLowerCase() === selectedCategory.toLowerCase();
   });
 
-  const handleNext = () => {
-    if (currentIndex < filteredArticles.length - 1) {
-      setCurrentIndex((prev) => prev + 1);
-      setShowAiSummary(null);
-    }
-  };
-
-  const handlePrev = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex((prev) => prev - 1);
-      setShowAiSummary(null);
-    }
-  };
-
-  // Reset index when category switches
+  // Reset scroll and AI expansion when category switches
   const handleCategoryChange = (cat: string) => {
     setSelectedCategory(cat);
-    setCurrentIndex(0);
-    setShowAiSummary(null);
+    setExpandedAiStoryId(null);
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
-  const currentArticle = filteredArticles[currentIndex];
-
   return (
-    <div className="flex-1 min-h-screen flex flex-col pb-36 bg-background text-foreground transition-all duration-300 font-sans">
+    <div className="flex-1 min-h-screen flex flex-col bg-background text-foreground transition-all duration-300 font-sans">
       
-      {/* Standardized Header */}
-      <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="max-w-xl mx-auto px-4 h-16 flex items-center justify-between">
-          <span className="font-serif text-2xl font-extrabold tracking-tight">Ilm.</span>
+      {/* Standard Header */}
+      <header className="sticky top-0 z-40 w-full border-b border-border bg-background/70 backdrop-blur-md">
+        <div className="max-w-xl mx-auto px-6 h-16 flex items-center justify-between">
+          <span className="font-serif text-2xl font-black tracking-tight text-primary">Ilm.</span>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-muted-foreground mr-2">
+            <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground mr-2">
               <Link href="/about" className="hover:text-foreground transition-colors">About</Link>
               <Link href="/contact" className="hover:text-foreground transition-colors">Contact</Link>
             </div>
             <button 
               onClick={toggleTheme}
-              className="p-1.5 rounded-full border border-border hover:bg-secondary text-muted-foreground hover:text-foreground transition-all"
+              className="p-2 rounded-full border border-border hover:bg-secondary text-muted-foreground hover:text-foreground transition-all"
               aria-label="Toggle theme"
             >
-              {isDarkMode ? <Sun className="h-4 w-4 text-yellow-500" /> : <Moon className="h-4 w-4" />}
+              {isDarkMode ? <Sun className="h-4 w-4 text-primary" /> : <Moon className="h-4 w-4" />}
             </button>
           </div>
         </div>
       </header>
 
       {/* Filter Categories Selector */}
-      <div className="w-full border-b border-border bg-card/65 py-2.5 overflow-x-auto whitespace-nowrap scrollbar-none sticky top-16 z-30">
-        <div className="max-w-xl mx-auto px-4 flex gap-2">
+      <div className="w-full border-b border-border bg-card/45 py-2.5 overflow-x-auto whitespace-nowrap scrollbar-none sticky top-16 z-30">
+        <div className="max-w-xl mx-auto px-6 flex gap-2">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => handleCategoryChange(cat)}
-              className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full border transition-all ${
+              className={`text-[9px] font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full border transition-all ${
                 selectedCategory === cat
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-background text-muted-foreground border-border hover:bg-secondary hover:text-foreground"
@@ -279,115 +265,123 @@ export default function NewsPage() {
         </div>
       </div>
 
-      {/* Main deck article */}
-      <div className="flex-1 max-w-xl w-full mx-auto px-4 py-8 flex flex-col justify-center">
-        <AnimatePresence mode="wait">
-          {currentArticle ? (
-            <motion.div
-              key={currentArticle.id}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.25 }}
-              className="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col gap-4 relative"
-            >
-              <div className="flex items-center justify-between pb-2 border-b border-border/40">
-                <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-primary/10 text-foreground border border-border">
-                  {currentArticle.tag}
-                </span>
-                <span className="text-[10px] font-bold text-muted-foreground">{currentArticle.readTime}</span>
-              </div>
-
-              <div>
-                <span className="text-[10px] font-bold text-muted-foreground block mb-1">Source: {currentArticle.source}</span>
-                <h2 className="text-xl font-serif font-extrabold tracking-tight leading-snug mb-3 text-foreground">
-                  {currentArticle.title}
-                </h2>
-                <p className="text-xs leading-relaxed font-semibold text-foreground/90">
-                  {currentArticle.summary}
-                </p>
-
-                <AnimatePresence>
-                  {showAiSummary === currentArticle.id && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="p-4 rounded-lg bg-secondary/60 border border-border/80 text-xs leading-relaxed text-foreground mt-3"
-                    >
-                      <span className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 mb-2">
-                        <Sparkles className="h-3 w-3" /> AI Expanded Context & Takeaways
+      {/* Vertical Snap Deck (Reels style finger scroll) */}
+      <div 
+        ref={scrollContainerRef}
+        className="flex-1 max-w-xl w-full mx-auto overflow-y-auto snap-y snap-mandatory scrollbar-none h-[calc(100vh-210px)] pb-12"
+      >
+        <div className="px-6 flex flex-col">
+          {filteredArticles.length > 0 ? (
+            filteredArticles.map((art, idx) => {
+              const isOpen = expandedAiStoryId === art.id;
+              
+              return (
+                <div 
+                  key={art.id}
+                  className="h-[calc(100vh-210px)] snap-start snap-always shrink-0 flex flex-col justify-center py-4 relative"
+                >
+                  <motion.div 
+                    whileHover={{ scale: 1.005 }}
+                    className="glass-panel rounded-2xl p-6 flex flex-col gap-4 relative overflow-hidden max-h-[92%] overflow-y-auto shadow-md"
+                  >
+                    {/* Header tags */}
+                    <div className="flex items-center justify-between pb-2.5 border-b border-border/30">
+                      <span className="text-[8px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/25">
+                        {art.tag}
                       </span>
-                      <p className="italic text-muted-foreground mb-2">
-                        &ldquo;{currentArticle.fullStory}&rdquo;
+                      <span className="text-[10px] font-bold text-muted-foreground">{art.readTime}</span>
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1">
+                      <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest block mb-1">
+                        Source: {art.source}
+                      </span>
+                      <h2 className="text-lg sm:text-xl font-serif font-black tracking-tight leading-snug mb-3 text-foreground">
+                        {art.title}
+                      </h2>
+                      <p className="text-xs sm:text-sm leading-relaxed text-foreground/90 font-medium">
+                        {art.summary}
                       </p>
-                      <div className="h-px bg-border/45 my-2" />
-                      <p className="font-semibold text-foreground">
-                        Key Takeaway: Critical insights and global movements matching your preferences.
-                      </p>
+
+                      {/* AI expanded dropdown view */}
+                      <AnimatePresence>
+                        {isOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="overflow-hidden mt-3"
+                          >
+                            <div className="p-4 rounded-xl bg-secondary/40 border border-border/60 text-xs leading-relaxed text-foreground">
+                              <span className="font-bold text-[9px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 mb-2">
+                                <Sparkles className="h-3.5 w-3.5 text-primary" /> AI Expanded Context & Takeaways
+                              </span>
+                              <p className="italic text-muted-foreground mb-3 font-serif">
+                                &ldquo;{art.fullStory}&rdquo;
+                              </p>
+                              <div className="h-px bg-border/45 my-2" />
+                              <p className="font-bold text-foreground">
+                                key lesson: Matches daily track indicators. Highly relevant to updates in {art.tag}.
+                              </p>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    {/* Footer options */}
+                    <div className="border-t border-border/30 pt-3 flex items-center justify-between mt-auto">
+                      <button
+                        onClick={() => handleToggleAi(art.id)}
+                        className={`text-[9px] font-black uppercase tracking-wider px-4 py-2.5 rounded-full border transition-all flex items-center gap-1.5 ${
+                          isOpen
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-secondary text-secondary-foreground border-border hover:bg-primary hover:text-primary-foreground hover:border-primary"
+                        }`}
+                      >
+                        <Sparkles className="h-3.5 w-3.5" />
+                        <span>{isOpen ? "Hide AI Summary" : "AI In-Depth"}</span>
+                      </button>
+
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={() => handleToggleBookmark(art.id)}
+                          className="p-2 rounded-full border border-border bg-secondary/35 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+                          aria-label="Bookmark article"
+                        >
+                          {savedNews.includes(art.id) ? (
+                            <BookmarkCheck className="h-4.5 w-4.5 text-primary" />
+                          ) : (
+                            <Bookmark className="h-4.5 w-4.5" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Swipe guide on the first item only */}
+                  {idx === 0 && filteredArticles.length > 1 && (
+                    <motion.div 
+                      animate={{ y: [0, 6, 0] }}
+                      transition={{ repeat: Infinity, duration: 1.5 }}
+                      className="absolute bottom-2 left-0 right-0 flex flex-col items-center justify-center pointer-events-none"
+                    >
+                      <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 flex items-center gap-1">
+                        Swipe or scroll down
+                        <ArrowDown className="h-3 w-3" />
+                      </span>
                     </motion.div>
                   )}
-                </AnimatePresence>
-              </div>
-
-              <div className="border-t border-border/40 pt-4 mt-4 flex items-center justify-between">
-                <button
-                  onClick={() => handleToggleAi(currentArticle.id)}
-                  className={`text-xs font-bold px-3.5 py-2 rounded-full border transition-all flex items-center gap-1.5 ${
-                    showAiSummary === currentArticle.id
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-secondary text-secondary-foreground border-border hover:bg-primary hover:text-primary-foreground hover:border-primary"
-                  }`}
-                >
-                  <Sparkles className="h-3.5 w-3.5" />
-                  <span>{showAiSummary === currentArticle.id ? "Hide AI Summary" : "AI In-Depth"}</span>
-                </button>
-
-                <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => handleToggleBookmark(currentArticle.id)}
-                    className="p-2 rounded-full border border-border hover:bg-secondary text-muted-foreground hover:text-foreground transition-all"
-                    aria-label="Bookmark article"
-                  >
-                    {savedNews.includes(currentArticle.id) ? (
-                      <BookmarkCheck className="h-4 w-4 text-primary" />
-                    ) : (
-                      <Bookmark className="h-4 w-4" />
-                    )}
-                  </button>
                 </div>
-              </div>
-            </motion.div>
+              );
+            })
           ) : (
-            <div className="text-center py-16 text-muted-foreground">
+            <div className="text-center py-24 text-muted-foreground font-serif">
               No news available for the selected category.
             </div>
           )}
-        </AnimatePresence>
-
-        {filteredArticles.length > 1 && (
-          <div className="flex justify-center gap-3 mt-6">
-            <button
-              onClick={handlePrev}
-              disabled={currentIndex === 0}
-              className="p-2.5 rounded-full border border-border bg-card hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed transition-all text-foreground"
-              aria-label="Previous Article"
-            >
-              <ArrowUp className="h-4.5 w-4.5" />
-            </button>
-            <span className="text-xs font-bold font-mono self-center px-2">
-              {currentIndex + 1} / {filteredArticles.length}
-            </span>
-            <button
-              onClick={handleNext}
-              disabled={currentIndex === filteredArticles.length - 1}
-              className="p-2.5 rounded-full border border-border bg-card hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed transition-all text-foreground"
-              aria-label="Next Article"
-            >
-              <ArrowDown className="h-4.5 w-4.5" />
-            </button>
-          </div>
-        )}
+        </div>
       </div>
 
     </div>
