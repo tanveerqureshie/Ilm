@@ -13,7 +13,7 @@ export default function AiChatbox() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "model", text: "Hello! I am your Gemini-powered Ilm assistant. Ask me anything about today's concepts, goals, or coding challenges!" }
+    { role: "model", text: "Hello! I am your iilm assistant. Ask me anything about today's concepts, goals, or coding challenges!" }
   ]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -93,7 +93,7 @@ export default function AiChatbox() {
                   <Sparkles className="h-4 w-4" />
                 </div>
                 <div>
-                  <h3 className="text-xs font-extrabold text-foreground">Gemini Assistant</h3>
+                  <h3 className="text-xs font-extrabold text-foreground">iilm Assistant</h3>
                   <div className="flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                     <span className="text-[8px] font-bold text-muted-foreground uppercase">Online</span>

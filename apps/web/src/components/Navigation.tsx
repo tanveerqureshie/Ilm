@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Compass, Network, Sparkles, User } from "lucide-react";
+import { Home, Compass, Box, Sparkles, User } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Navigation() {
@@ -27,7 +27,7 @@ export default function Navigation() {
   const links = [
     { href: "/dashboard", label: "Home", icon: Home },
     { href: "/explore", label: "Explore", icon: Compass },
-    { href: "/graph", label: "Graph", icon: Network },
+    { href: "/graph", label: "3D View", icon: Box },
     { href: "/profile", label: "Profile", icon: User }
   ];
 

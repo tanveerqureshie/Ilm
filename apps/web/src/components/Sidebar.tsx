@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Compass, Network, User, Calendar, LogOut, Sun, Moon } from "lucide-react";
+import { Home, Compass, Box, User, Calendar, LogOut, Sun, Moon } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Sidebar() {
@@ -48,7 +48,7 @@ export default function Sidebar() {
   const links = [
     { href: "/dashboard", label: "Home Feed", icon: Home },
     { href: "/explore", label: "Explore Stories", icon: Compass },
-    { href: "/graph", label: "Knowledge Graph", icon: Network },
+    { href: "/graph", label: "3D Visualizer", icon: Box },
     { href: "/profile", label: "Profile & Settings", icon: User }
   ];
 
